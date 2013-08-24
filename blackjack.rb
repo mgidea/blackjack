@@ -1,14 +1,16 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
-
-player_hand = []
+my_hand = []
 dealer_hand = []
-
-player_score = 0
+card_value = {}
+my_score = 0
 dealer_score = 0
-
 SUITS = ['♠', '♣', '♥', '♦']
 VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+scores = [10,10,10,10,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,9,9,9,9,0,0,0,0,10,10,10,10,10,
+  10,10,10,10,10,10,10]
+
+
 
 def build_deck
   deck = []
@@ -18,73 +20,105 @@ def build_deck
       deck.push(value + suit)
     end
   end
-  return deck
-end
 
-def next_card(shuffle)
-  shuffle.pop
+  deck.shuffle
 end
-
 deck = build_deck
-shuffled_deck = deck.shuffle
- 
-value_hash = {}
+sorted_deck = deck.sort
+sorted_deck.each_with_index {|k,i|card_value[k] = scores[i]}
+deck = build_deck
+next_card = deck.pop
+puts
 
-card_value = [2,3,4,5,6,7,8,9,10,10,10,10,0,2,3,4,5,6,7,8,9,10,10,10,10,0,2,3,4,5,6,7,8,9,10,10,10,10,0,2,3,4,5,6,7,8,9,10,10,10,10,0]
+def score (hand, hash)
+  total = 0
+  hand.each do |card|
+  var = hash.fetch(card)
+    if var == 0 && total < 11
+      var = 11
+    elsif var == 0 && total >= 11
+      var = 1
+    end
+    total += var
+  end
+  total
+end
 
-deck.each_with_index {|k,i|value_hash[k] = card_value[i]}
+def hit(card, hand, fifty_two)
+  card = fifty_two.pop
+  hand << card
+end
 
-player_hand.push(next_card(shuffled_deck))
-player_hand.push(next_card(shuffled_deck))
-
-dealer_hand.push(next_card(shuffled_deck))
-dealer_hand.push(next_card(shuffled_deck))
+hit(next_card, my_hand, deck)
+hit(next_card, my_hand, deck)
+hit(next_card, dealer_hand, deck)
+hit(next_card, dealer_hand, deck)
+my_score = score(my_hand, card_value)
+dealer_score = score(dealer_hand, card_value)
 
 puts "Welcome to Blackjack!"
-puts 
-
-puts "Player was dealt #{player_hand[0]}"
-puts "Player was dealt #{player_hand[1]}"
-
-# puts "Player score #{player_score}"
-
-puts "hit or stand (h/s): "
-
+puts
+puts "Player was dealt #{my_hand[0]}"
+puts "Player was dealt #{my_hand[1]}"
+puts
+puts "Player score: #{my_score}"
+puts "Hit or stand (h/s): "
 input = gets.chomp
-
-if input == "h"
-  player_hand.push(next_card(shuffled_deck))
-elsif input == "s"
-  # puts "Player score #{player_score}"
-  puts "Dealer was dealt #{dealer_hand[0]}"
-  puts "Dealer was dealt #{dealer_hand[1]}"
-  # puts "Dealer score #{dealer_score}"
+puts
+while input == "h"
+  hit(next_card, my_hand, deck)
+    puts "Player was dealt #{my_hand[-1]}"
+    my_score = score(my_hand, card_value)
+    puts "Player score: #{my_score}"
+  if my_score > 21
+    puts "Bust! You lose..."
+    break
+  end
+  input = gets.chomp
 end
 
+if input == "s"
+  puts
+    puts "Player score: #{my_score}"
+    puts
+    puts
+    puts  "Dealer was dealt #{dealer_hand[0]}"
+    puts  "Dealer was dealt #{dealer_hand[1]}"
+    puts  "Dealer score: #{dealer_score}"
+    puts
+  if dealer_score < 21 && dealer_score >= 17
+    puts
+      puts "Dealer stands"
+      puts
+    if my_score == dealer_score
+      puts "The game ends in a tie"
+    elsif my_score < dealer_score
+      puts "Sorry, the dealer wins"
+    else
+      puts "Congratulations, you win!"
+    end
+  end
+  while
+    dealer_score < 17
+    hit(next_card, dealer_hand, deck)
+      dealer_score = score(dealer_hand, card_value)
+      puts  "Dealer was dealt: #{dealer_hand[-1]}"
+      puts  "Dealer score: #{dealer_score}"
+    if dealer_score > 21
+      puts "Dealer busts, You win!"
+      break
+    else
+      puts
+        puts "Dealer stands"
+        puts
+      if my_score == dealer_score
+        puts "The game ends in a tie"
+      elsif my_score < dealer_score
+      puts "Sorry, the dealer wins"
+      else
+        puts "Congratulations, you win!"
+      end
+    end
+  end
+end
 
-  
-
-
-# puts player_hand[0]
-
-# puts player_hand
-
-# As a player
-# I want to be prompted to hit or stand
-# So that I know when I have to act
-
-# As a player
-# I want to know my current best possible score
-# So that I can decide whether to hit or stand
-
-# As a player
-# I want to hit
-# So that I can increase my score
-
-# As a player
-# I want to stand
-# So that I don't bust
-
-# As a dealer
-# I want to continue hitting until my score is at least 17
-# So that I get close to 21 without too much risk of busting.
