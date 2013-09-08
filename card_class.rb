@@ -12,5 +12,14 @@ class Card
     end
     puts "Create a new card: #{@rank} of #{@suit}"
   end
+
+  def suit
+    @suit
+  end
+
+  def rank
+    @rank
+  end
+
 end
  Card.new
