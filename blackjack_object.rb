@@ -53,7 +53,7 @@ end
 class Hand
   attr_reader :name, :cards
 
-  def initialize(name)
+  def initialize(name="Dealer")
      @cards = []
      @name = name
   end
@@ -64,6 +64,7 @@ class Hand
   end
 
   def stay
+    "the player chooses to stay with the cards he has"
 
   end
 
@@ -71,15 +72,15 @@ class Hand
     total = 0
     @cards.each do |card|
       if card.value == 1 && total > 10
-        card.calue == 11
+        card.value == 11
       end
       total += card.num_value
     end
     total
   end
 
-  def busted?(player)
-    player.score > 21
+  def busted?
+    score > 21
   end
 end
 
@@ -91,83 +92,61 @@ class Game
   end
 
   def deal
-    @dealer_hand = Hand.new("dealer")
-    @player_hand = Hand.new("player")
-    2.times {@player_hand.hit(@deck.pop)}
-    2.times {@dealer_hand.hit(@deck.pop)}
+    dealer = Hand.new
+    player = Hand.new("Tom")
+    2.times {player.hit(@deck.pop)}
+    2.times {dealer.hit(@deck.pop)}
     puts "Welcome to Blackjack!"
     puts
-    puts "Player was dealt #{@player_hand.cards[0].card} and #{@player_hand.cards[1].card}"
-    puts "Player's score is #{@player_hand.score}"
+    puts "#{player.name} was dealt #{player.cards[0].card} and #{player.cards[1].card}"
+    puts "#{player.name}'s score is #{player.score}"
     puts "Hit or stand (H/S): "
     input = gets.chomp
     while input.downcase == "h"
-      @player_hand.hit(@deck.pop)
-      puts "Player was dealt #{@player_hand.cards[-1].card}"
-      puts "Player score: #{@player_hand.score}"
-      if @player_hand.busted?(@player_hand)
+      player.hit(@deck.pop)
+      puts "#{player.name} was dealt #{player.cards[-1].card}"
+      puts "#{player.name}'s score: #{player.score}"
+      if player.busted?
         puts "Bust! You lose..."
         break
       end
+    puts "Hit or stand (H/S): "
     input = gets.chomp
     end
     if input.downcase == "s"
+      puts player.stay
       puts
-      puts "Player score: #{@player_hand.score}"
+      puts "#{player.name}'s score: #{player.score}"
       puts
       puts
-      puts  "Dealer was dealt #{@dealer_hand.cards[0].card} and #{@dealer_hand.cards[1].card}"
-      puts  "Dealer score: #{@dealer_hand.score}"
+      puts  "#{dealer.name} was dealt #{dealer.cards[0].card} and #{dealer.cards[1].card}"
+      puts  "#{dealer.name}'s score: #{dealer.score}"
       puts
-      if @dealer_hand.score >= 17
+      if dealer.score >= 17
         puts
-        puts "Dealer stands"
-        puts
-        if @player_hand.score == @dealer_hand.score
+        if player.score == dealer.score
           puts "The game ends in a tie"
-        elsif @player_hand.score < @dealer_hand.score
+        elsif player.score < dealer.score
           puts "Sorry, the dealer wins"
         else
           puts "Congratulations, you win!"
         end
       end
-      while @dealer_hand.score < 17
-        @dealer_hand.hit(@deck.pop)
-        puts "Dealer was dealt #{@dealer_hand.cards[-1].card}"
-        puts "Dealer score: #{@dealer_hand.score}"
-        if @dealer_hand.busted?(@dealer_hand)
-         puts "Dealer busts, You win!"
+      while dealer.score < 17
+        dealer.hit(@deck.pop)
+        puts "#{dealer.name} was dealt #{dealer.cards[-1].card}"
+        puts "#{dealer.name}'s score: #{dealer.score}"
+        if dealer.busted?
+          puts "#{dealer.name} busts, You win!"
           break
-        else
-          puts
-          puts "Dealer stands"
-          puts
-          if @dealer_hand.score == @player_hand.score
-            puts "The game ends in a tie"
-          elsif @player_hand.score < @dealer_hand.score
-            puts "Sorry, the dealer wins"
-          else
-            puts "Congratulations, you win!"
-          end
         end
+        if dealer.score >= 17
+        puts
+        puts "#{dealer.name} stands"
+        puts
       end
     end
   end
-
-
-
-
-
-# puts
-# puts
-# puts
-# puts "Player was dealt #{@player_hand.cards[1]}"
-# puts
-# puts "Player score: #{@player_hand.score}"
-
 end
 
-game = Game.new
-
-
-
+Game.new

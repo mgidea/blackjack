@@ -25,7 +25,7 @@ def build_deck
 end
 deck = build_deck
 sorted_deck = deck.sort
-sorted_deck.each_with_index {|k,i|card_value[k] = scores[i]}
+sorted_deck.each_with_index {|k,i| card_value[k] = scores[i]}
 deck = build_deck
 next_card = deck.pop
 puts
