@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
+"ok"
 my_hand = []
 dealer_hand = []
 card_value = {}
